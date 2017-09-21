@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Node Type</title>
+</head>
+
+<body>
+
+    <select name="" id="setNodeType">
+        <option value="0">---</option>
+        <option value="1">Element</option>
+        <option value="2">Attribute</option>
+        <option value="3">Text</option>
+        <option value="11">Fragment</option>
+    </select>
+    <script>
+        /* 显示Node接口的所有属性 */
+        function ShowAllNodeProperty() {
+            for (var key in Node) {
+                console.log(key + " = " + Node[key]);
+            }
+        }
+
+        /* ======= Case 2 ======== */
+
+        Function.prototype.getName = function() {
+            return this.name || this.toString().match(/function\s*([^(]*)\(/)[1]
+        }
+
+        window.addEventListener('load', function(evt) {
+            var selElmt = document.getElementById("setNodeType");
+            selElmt.addEventListener('change', function(evt) {
+                createNodeByType(evt.target.value);
+            })
+        })
+
+        /* 创建不同的nodeType 元素 */
+        function createNodeByType(nodeTypeCode, param) {
+            var funcMapper = {
+                1: createElmt,
+                2: createAttr,
+                3: createText,
+                11: createfragment
+            }
+
+            var innerElmt = document.querySelector('div');
+
+            var x = (funcMapper[nodeTypeCode]) && (funcMapper[nodeTypeCode](param));
+            innerElmt.innerText = x.constructor.getName();
+
+            function createElmt(tagName) {
+                tagName = tagName ? tagName : 'div';
+                var elmt = document.createElement(tagName);
+                innerElmt = elmt;
+                document.body.appendChild(elmt);
+                return elmt;
+            }
+
+            function createAttr() {
+                var elmt = innerElmt;
+                elmt.setAttribute('contentEditable', 'true');
+                var attr = elmt.getAttributeNode('contentEditable');
+                return attr;
+            }
+
+            function createText() {
+                var elmt = innerElmt;
+                var txt = document.createTextNode("Text");
+                elmt.appendChild(txt);
+                return txt;
+
+            }
+
+            function createfragment() {
+                var fragment = document.createDocumentFragment();
+                var div = document.createElement('div');
+                fragment.appendChild(div);
+                document.body.appendChild(fragment);
+                return fragment;
+            }
+        }
+    </script>
+</body>
+
+</html>
