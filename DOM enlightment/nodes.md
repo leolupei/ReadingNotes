@@ -5,7 +5,7 @@
 
 ### 1.2 节点对象类型 ###  
 
-[\[NodeType Sample\]](code/nodeType.html)
+[\[NodeType Sample\]](Code/nodeType.html)
 
 code | num | sample
 ---------|----------|---------
