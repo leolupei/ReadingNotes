@@ -21,8 +21,8 @@ code | num | sample
 
 ### 1.3 继承自节点对象的子对象 ###
 
-   interface | inherit 
-    ---------:|----------
+interface | inherit 
+---------|----------
   Node | Object - EventTarget - Node 
  HtmlElement | Node - Element - HTMLElement 
  Attr | Node - Attr (Dom4 弃用)
