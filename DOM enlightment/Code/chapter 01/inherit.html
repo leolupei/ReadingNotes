@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="">test</div>
+    <script>
+        // =========== 方法一，第一版 ==============
+        // - base function
+        Function.prototype.getName = function() {
+            return this.name || this.toString().match(/function\s*([^(]*)\(/)[1]
+        }
+
+        // - business function
+        function showTotalProperties(obj) {
+            var chain = []; // 内部链
+            var currentLayer = 0; // 当前层级
+            showLayerProperties();
+
+            // var currentConstructor = obj.constructor;
+            // - 构建一层的初始化结构
+            function createLayer() {
+                chain[currentLayer] = {
+                    type: obj.toString(),
+                    functions: [],
+                    properties: [],
+                    unknown: []
+                };
+            }
+
+            function showLayerProperties() {
+                // - 1. 获取自身
+                createLayer();
+                Object.getOwnPropertyNames(obj).forEach(function(v, k) {
+                    var typeFlag = -1;
+                    try {
+                        var typeFlag = obj[v] instanceof Function ? 1 : 0;
+                    } catch (ex) {
+                        if (ex instanceof TypeError) typeFlag = -1;
+                        else throw (ex);
+                    }
+
+                    switch (typeFlag) {
+                        case -1:
+                            chain[currentLayer].unknown.push({
+                                name: v
+                            });
+                            break;
+                        case 0:
+                            chain[currentLayer].properties.push({
+                                name: v,
+                                enumerable: obj.propertyIsEnumerable(v)
+                            });
+                            break;
+                        case 1:
+                            chain[currentLayer].functions.push({
+                                name: v,
+                                enumerable: obj.propertyIsEnumerable(v)
+                            })
+                            break;
+                    }
+                });
+
+                // - 2. 查询prototype
+                obj = Object.getPrototypeOf(obj);
+                if (obj) {
+                    currentLayer++;
+                    showLayerProperties(obj);
+                }
+            }
+
+            return chain;
+        }
+
+        // =========== 方法二 ==============
+
+        Object.prototype.getPropertyNames = function(obj) {
+            var chain = [];
+            do {
+                chain.push({
+                    typeName: obj.toString(),
+                    propertyNames: Object.getOwnPropertyNames(obj).sort()
+                });
+            }
+            while (obj = Object.getPrototypeOf(obj));
+            return chain;
+        }
+
+        // =========== 方法三 ==============
+
+        Object.prototype.getEnumerablePropertyNames = function(obj) {
+            var arr = [];
+            for (var i in obj) {
+                arr.push(i);
+            }
+            return arr;
+        }
+
+
+        // var div = document.querySelector('div');
+        // var p = Object.getEnumerablePropertyNames(div);
+
+        var nodes = document.body.childNodes;
+
+        var chain = Object.getPropertyNames(nodes);
+    </script>
+</body>
+
+</html>

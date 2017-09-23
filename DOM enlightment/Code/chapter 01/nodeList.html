@@ -9,16 +9,11 @@
 </head>
 
 <body>
-    <div class=""></div>
     <script>
-        var div = document.querySelector('div');
-        var props = [];
+        var nodes = document.body.childNodes;
 
-        for (var p in div.constructor.prototype) {
-            props.push(p);
-        }
-
-        console.log(props.sort());
+        var arrNodes = Array.prototype.slice.call(nodes);
+        var arrNodes2 = Array.from(nodes);
     </script>
 </body>
 

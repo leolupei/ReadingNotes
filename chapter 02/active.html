@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div>one
+        <p>ppp</p>
+    </div>
+    <div>
+        two
+    </div>
+    <select>
+        <option value="2"></option>
+        <option value="3"></option>
+        <option value="4"></option>
+    </select>
+    <script>
+        window.addEventListener('load', function(evt) {
+            arr = Array.from(document.body.children);
+            arr.forEach(function(v, k) {
+                var n, n2;
+                v.addEventListener('click', function(evt) {
+                    console.log(n = document.activeElement);
+                    console.log(n2 = evt.target);
+                    console.log(n.ownerDocument);
+                    console.log(n2.ownerDocument);
+                })
+            });
+        })
+    </script>
+</body>
+
+</html>

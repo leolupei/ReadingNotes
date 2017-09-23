@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        Object.prototype.getPropertNames = function(obj) {
+            var chain = [];
+            do {
+                chain.push({
+                    type: obj.toString(),
+                    propertyNames: Object.getOwnPropertyNames(obj).sort()
+                });
+
+            } while (obj = Object.getPrototypeOf(obj));
+            return chain;
+        }
+
+        console.log(Object.getPropertNames(document));
+
+        console.log(document.doctype);
+        console.log(document.documentElement);
+        console.log(document.head);
+        console.log(document.body);
+    </script>
+</body>
+
+</html>

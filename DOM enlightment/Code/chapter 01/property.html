@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="testDiv">test</div>
+</body>
+<script>
+    var node, cloneNode;
+    window.addEventListener('load', function(evt) {
+        node = document.querySelector('div');
+
+        // - appendChild test
+        function appendChild() {
+            // - Node.appendChild,  参数必须是Node对象
+            var p;
+            try {
+                p = node.appendChild("p");
+            } catch (e) {
+                console.log(e.message);
+            }
+
+            p = document.createElement('p');
+            p.innerText = "p";
+            node.appendChild(p);
+            return p;
+        }
+
+        function cloneNode(isDeep) {
+            var cloneNode = node.cloneNode(isDeep);
+            return cloneNode;
+        }
+
+        function compareDocumentPostion() {
+            return node.compareDocumentPosition(cloneNode);
+        }
+
+        function insert(type, parentElmt, newElmt, refElmt) {
+            var node;
+            if (type) {
+                node = parentElmt.insertBefore(newElmt, refElmt);
+            } else {
+                node = parentElmt.insertBefore(newElmt, refElmt.nextSibling);
+            }
+        }
+
+        appendChild();
+        document.body.appendChild(cloneNode = cloneNode(true));
+        console.log(compareDocumentPostion());
+        console.log(document.body.contains(node));
+        console.log(node.hasChildNodes())
+
+        var p = document.createElement('p');
+        p.innerText = "inner test";
+        insert(1, node, p, node.querySelector('p'));
+
+        console.log(node.isEqualNode(cloneNode));
+
+    })
+</script>
+
+</html>
