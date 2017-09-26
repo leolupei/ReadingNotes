@@ -63,3 +63,4 @@ interface | inherit
 >* document.hasFocus 明当前文档或者当前文档内的节点是否获得了焦点
 >* document.defaultView 在浏览器中，该属性返回当前 document 对象所关联的 window 对象，如果没有，会返回 null。
 >* Node.ownerDocument , 只读属性，任何一个dom元素都会返回当前节点的顶层的 document 对象
+>

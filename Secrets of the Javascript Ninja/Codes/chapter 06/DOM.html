@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="subTree">
+        <form>
+            <input type="text" />
+        </form>
+        <p>Paragraph</p>
+        <span>Span</span>
+    </div>
+    <script>
+        // - 方法 1 recursive
+        function traverseDOM(elmt, callback, level) {
+            callback(elmt, level);
+            if (elmt = elmt.firstElementChild) {
+                level++;
+                do {
+                    traverseDOM(elmt, callback, level);
+                } while (elmt = elmt.nextElementSibling);
+
+            }
+
+        }
+
+        traverseDOM(document.body, function(elmt, lvl) {
+            console.log(lvl + " - " + elmt.tagName);
+        }, 0);
+
+        // -方法 2 generator
+        function traverseDOMByGen(elmt, level) {
+            var iterator = generator(elmt, level);
+            for (var v of iterator) {
+                console.log(v.level + " - " + v.elmt.tagName);
+            }
+
+            function* generator(elmt, level) {
+                yield({
+                    elmt: elmt,
+                    level: level
+                });
+                for ((elmt = elmt.firstElementChild);
+                    (elmt);
+                    (elmt = elmt.nextElementSibling)) {
+                    yield* generator(elmt, level + 1);
+                }
+            }
+        }
+
+
+        console.log("------");
+        traverseDOMByGen(document.body, 0);
+    </script>
+</body>
+
+</html>
