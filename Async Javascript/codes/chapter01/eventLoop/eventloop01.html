@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Loop event</title>
+    <!-- <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script> -->
+</head>
+
+<body>
+    <script>
+        /*
+                                                                                                                                                                                                                                                                                                                                                                                                                        var xhr = new XMLHttpRequest();
+                                                                                                                                                                                                                                                                                                                                                                                                                        xhr.open("GET", "http://localhost:3000/req_ninja", false);
+                                                                                                                                                                                                                                                                                                                                                                                                                        xhr.onreadystatechange = function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                            if (this.readyState == 4) {
+                                                                                                                                                                                                                                                                                                                                                                                                                                console.log(this.responseText);
+                                                                                                                                                                                                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                                                                                                                                                                                                        };
+                                                                                                                                                                                                                                                                                                                                                                                                                        xhr.send();
+                                                                                                                                                                                                                                                                                                                                                                                                                        console.log("test async");
+                                                                                                                                                                                                                                                                                                                                                                                                                        */
+
+        function func1() {
+            console.log('func 1');
+        }
+
+
+        function func2() {
+            console.log('func 2');
+        }
+
+        function func3() {
+            console.log('func 3');
+        }
+
+        function func4() {
+            console.log('func 4');
+        }
+
+        function func5() {
+            console.log('func 5');
+        }
+
+        function func() {
+            func1();
+
+            setTimeout(function() {
+                func2();
+            }, 10);
+
+            /*xhr*/
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", "http://localhost:3000/req_ninja", true);
+            xhr.send();
+            xhr.onreadystatechange = function() {
+                if (this.readyState == 4) func5();
+            }
+
+            Promise.resolve().then(func3);
+            func4();
+        };
+        //func();
+
+
+        // for (var d1 = new Date(); new Date() - d1　 < 2000;) {
+
+        // }
+
+        window.onload = function() {
+            document.getElementById("btn")
+                .addEventListener(
+                    "click", () => func()
+                )
+        }
+    </script>
+
+    <button id="btn">test</button>
+</body>
+
+</html>
