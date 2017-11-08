@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .All,
+        .Race {
+            display: block;
+            padding: 4px;
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        (function () {
+            document.addEventListener("DOMContentLoaded", () => {
+                AllMethod();
+                RaceMethod();
+            })
+
+            function request(url) {
+                return new Promise(function (resolved, reject) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", url);
+                    xhr.responseType = "json";
+                    xhr.addEventListener("readystatechange", function () {
+                        if (xhr.readyState == XMLHttpRequest.DONE) {
+                            if (xhr.status == '200' || xhr.status == '304') {
+                                resolved(xhr.response);
+                            }
+                            else {
+                                reject(new Error("ajax failed"))
+                            }
+                        }
+                    })
+                    xhr.send();
+                    xhr.addEventListener('error', function (evt) {
+                        reject(evt.error);
+                    })
+                });
+            }
+
+            function AllMethod() {
+                document.querySelector(".All").addEventListener("click", () => {
+
+                    let p1 = request("http://localhost:3000/age");
+                    let p2 = 300;
+
+                    Promise.all([p1, p2]).then((v) => {
+                        console.log(v[0].length + "  " + v[1]);
+                    })
+                });
+            }
+            function RaceMethod() {
+                document.querySelector(".Race").addEventListener("click", () => {
+                    let p1 = request("http://localhost:3000/age");
+                    let p2 = new Promise(function(resolved, reject){
+                        setTimeout(resolved, 1000, 200);
+                    });
+
+                    Promise.race([p1, p2]).then((v) => {
+                        console.log(v);
+                    });
+                })
+            }
+
+        })();
+    </script>
+    <button class="All">All</button>
+    <button class="Race">Race</button>
+</body>
+
+</html>

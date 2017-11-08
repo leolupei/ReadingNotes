@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="lib/lib.js"></script>
+    <script>
+        window.addEventListener("DOMContentLoaded", function () {
+            var btn1 = document.querySelector("button");
+            btn1.addEventListener("click", () =>
+                add(fetchX(), fetchY()).then(sum => console.log(sum)))
+
+        });
+
+        function add(xp, yp) {
+            return Promise.all([xp, yp]).then(function (v) {
+                return v[0] + v[1];
+            })
+        }
+
+        function fetchX() {
+            return new Promise(function (resolve, reject) {
+                ajax("http://localhost:3000/age", (err, data) => {
+                    if (!err) resolve(data);
+                    else reject(err); 
+                });
+            }).then(data => 1);
+        }
+
+        function fetchY() {
+            return new Promise(function (resolve, reject) {
+                ajax("http://localhost:3000/age", (err, data) => {
+                    if (!err) resolve(data);
+                    else reject(err);
+                });
+            }).then(data => 2);
+        }
+
+    </script>
+</head>
+
+<body>
+    <button id="btn1"> 1 + 2 </button>
+</body>
+
+</html>

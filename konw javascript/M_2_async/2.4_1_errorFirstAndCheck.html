@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+
+<body>
+    <button id="btn3">异步校验</button>
+</body>
+
+<script>
+    // - 触发 DOM
+    var btn3 = document.getElementById('btn3');
+
+    // - error-first 风格的回调设计
+    function ajax2(url, fn) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url);
+        xhr.responseType = "json";
+        xhr.addEventListener("readystatechange", (evt) => {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                if (xhr.status == 200 || xhr.status == 304) {
+                    fn(null, xhr.response);
+                }
+                else {
+                    fn(new Error(xhr.statusText))
+                }
+            }
+
+        });
+        xhr.addEventListener('error', (evt) => fn(new Error(xhr.statusText)));
+        xhr.send();
+    }
+
+    // - continuation的设计 ,  最大延迟
+
+    function timeoutify(fn, delay) {
+        var timer = setTimeout(function () {
+            timer = null;
+            fn(new Error("timeout"));
+        }, delay);
+
+        return function () {
+            if (timer) {
+                clearTimeout(timer);
+                fn(...arguments);
+            }
+        }
+    }
+
+    // - 最早触发
+    function asyncify(fn) {
+        var orginFn = fn,
+            timer = setTimeout(function () {
+                timer = null;
+                if (fn) fn();
+            }, 50)
+
+        fn = null;
+
+        return function () {
+            if (timer) {
+                fn = orginFn.bind(...arguments);
+            }
+            else {
+                orginFn(...arguments);
+            }
+        }
+    }
+
+
+    function timeController(fn, dt, ot) {
+
+        function swap(a, b) { a ^= b; b ^= a; a ^= b }
+        if (dt > ot) swap(dt, ot);
+
+        let
+            delayFn,  // - 延迟的回调方法
+            delay = setTimeout(function () {
+                delay = null;
+                if (delayFn) delayFn();
+            }, dt),
+            over = setTimeout(function () {
+                over = null;
+                fn(new Error("timeout"));
+            }, ot);
+
+        return function () {
+            // - earlier
+            if (delay) {
+                clearTimeout(over);
+                delayFn = fn.bind(...[this].concat(...arguments));
+            }
+            // - later 不需要做动作, timeout已经处理
+            
+            // - normal
+            else if(over) {
+                clearTimeout(over);
+                fn(...arguments);
+            }
+
+        }
+    }
+
+    // - ----------
+    function response(error, data) {
+        error
+            ? console.error(error.message)
+            : console.log(data);
+    }
+
+    btn3.addEventListener('click', () => ajax2("http://localhost:3000/age", timeController(response, 2000, 3000)))
+
+
+
+</script>
+
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+
+<body>
+    <button id="btn">嵌套回调</button>
+    <br/>
+    <button id="btn2">异步/同步</button>
+    <br/>
+    <button id="btn3">异步校验</button>
+
+</body>
+
+<script>
+    // - 触发 DOM
+    var btn = document.getElementById('btn');
+    var btn2 = document.getElementById('btn2');
+    var btn3 = document.getElementById('btn3');
+    // - Ajax 方法
+    function ajax(url, func) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url);
+        xhr.responseText = "json";
+        xhr.addEventListener("readystatechange", (evt) => {
+            if (xhr.readyState == 4) {
+                func.apply(xhr, Array.prototype.slice.call(arguments, 2));
+            }
+        });
+        xhr.send();
+    }
+    // - 业务方法
+    // - - 多层异步
+    btn.addEventListener('click', (evt) => {
+        setTimeout(() => {
+            ajax("http://localhost:3000/age", function () { console.log(this.response) })
+        }, 1000);
+    })
+
+    // - test 2
+    btn2.addEventListener("click", () => {
+        let a = 0;
+        ajax("http://localhost:3000/age", () => console.log(a));
+        a = 1;
+    })
+
+    // - error-first 风格的回调设计
+    function ajax2(url, fn) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url);
+        xhr.responseType = "json";
+        xhr.addEventListener("readystatechange", (evt) => {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                if (xhr.status == 200 || xhr.status == 304) {
+                    fn(null, xhr.response);
+                }
+                else {
+                    fn(new Error(xhr.statusText))
+                }
+            }
+        });
+        xhr.addEventListener('error', (evt) => fn(new Error(xhr.statusText)));
+        xhr.send();
+    }
+
+    // - continuation的设计
+
+    function timeoutify(fn, delay) {
+        var timer = setTimeout(function () {
+            timer = null;
+            fn(new Error("timeout"));
+        }, delay);
+
+        return function () {
+            if (timer) {
+                clearTimeout(timer);
+                fn(...arguments);
+            }
+        }
+    }
+
+    function response(error, data) {
+        error
+            ? console.error(error.message)
+            : console.log(data);
+    }
+
+    btn3.addEventListener('click', () => ajax2("http://localhost:3000/age", timeoutify(response, 500)))
+
+
+
+
+</script>
+
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .scrollDiv {
+            width: 100px;
+            height: 100px;
+            border: 1px dotted orange;
+            overflow: scroll
+        }
+    </style>
+    <script>
+
+
+        // = =======================
+        (function () {
+            var a = 20;
+            function foo() { console.log(a = a + 1); }
+            function bar() { console.log(a = a * 2); }
+
+            ajax("http://localhost:3000/name", foo);
+            ajax("http://localhost:3000/age", bar);
+
+            function ajax(url, func) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", url);
+                xhr.addEventListener("readystatechange", (evt) => {
+                    if (xhr.readyState == 4) {
+                        func.call(this);
+                        console.log(xhr.responseText);
+                    }
+                });
+                xhr.send();
+            }
+        });
+
+        // - ========================
+
+        function ajax(url, func) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url);
+            xhr.responseText = "json";
+            xhr.addEventListener("readystatechange", (evt) => {
+                if (xhr.readyState == 4) {
+                    func.apply(xhr, Array.prototype.slice.call(arguments, 2));
+                    //console.log(xhr.response);
+                }
+            });
+            xhr.send();
+        }
+
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+        }
+
+        // = =========================
+        document.addEventListener("DOMContentLoaded", function () {
+            let div = document.querySelector("div");
+            let i = 0, j = 0;
+            div.addEventListener("scroll", function () {
+                console.log("onscroll - " + j++);
+                ajax("http://localhost:3000/age", function () {
+                    console.log("ajax 请求 - " + i++);
+                });
+            })
+        });
+
+        // = =======================
+
+        (function () {
+            var a, b;
+            function foo(x) {
+                a = x * 2;
+                if (a && b)
+                    baz();
+            }
+            function bar(y) {
+                b = y * 2;
+                if (a && b)
+                    baz();
+            }
+            function baz() {
+                console.log(a + b);
+            } // ajax(..) 是 某个 库 中的 某个 Ajax 函数 
+            ajax("http://localhost:3000/age", foo, 1);
+            ajax("http://localhost:3000/age", bar, 2);
+        });
+
+        // - ----
+        function mytest() {
+            var res = [];
+
+            function response(d) {
+                let data = d || JSON.parse(this.response);
+
+                let tick = Date.now();
+
+                let sd = data.splice(0, 200000);
+
+                res = res.concat(sd.map(v => v * 2));
+
+
+                var n = getRandomInt(0, 2000);
+                if (data.length) {
+                    setTimeout(function () {
+                        response(data);
+                    }, n);
+                }
+
+                console.log(res);
+                console.log("---------01ticks: " + (Date.now() - tick))
+            }
+
+            function response2(d) {
+                let data = d || JSON.parse(this.response);
+
+                let tick = Date.now();
+
+                let sd = data.splice(0, 200000);
+
+                var n = getRandomInt(0, 2000);
+                if (data.length) {
+                    setTimeout(function () {
+                        response2(data);
+                    }, n);
+                }
+                
+                res = res.concat(sd.map(v => v + 2));
+
+                console.log(res);
+                console.log("---------02ticks: " + (Date.now() - tick))
+            }
+            ajax("http://localhost:3000/name", response);
+            ajax("http://localhost:3000/name", response2);
+        }
+
+
+        /// - ===================
+        
+
+        window.addEventListener("DOMContentLoaded", function (evt) {
+            var coop = document.getElementById("coop");
+            //coop.addEventListener("click", () => mytest());
+        })
+    </script>
+
+    <body>
+        <div class="scrollDiv">DIVCSS5测试内容，欢迎来到DIVCSS5学习DIV+CSS技术。大家可以通 过DIVCSS5主站上的所有免费CSS教程足可学会DIV CSS技术 - 如果需要深入系统学习、较短时间达到 理想学习效果可参加DIV+CSS培训班学习。
+        </div>
+        <button id="coop">coop</button>
+    </body>
+
+</html>

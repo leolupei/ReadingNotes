@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="lib/lib.js"></script>
+    <script>
+
+        // - ========== 耦合的代码 ===================
+        function foo2() {
+            var status = 0;
+            var data = null;
+            var delayFn = null;
+
+            var t = setTimeout(function () {
+                status = 1;
+                t = null;
+                data = "foo";
+                if (delayFn) delayFn();
+            }, 1000);
+
+            return {
+                on: function (type, fn) {
+                    if (type == "completion") {
+                        if (status == 0) {
+                            delayFn = fn.bind(this, data);
+                        }
+                        else {
+                            fn(data);
+                        }
+                    }
+                    if (type == "failure") { }
+                }
+            }
+        }
+
+        // - ===================== server ===============
+        function listener(fn) {
+            let status = 0,
+                delayF = null,
+                data = null;
+
+            // - 拿到 fn 的值
+            data = fn(intercepter);
+
+            // - 拦截器
+            function intercepter(asynCallback) {
+                return function () {
+                    status = 1;
+                    data = asynCallback();
+                    if (delayF) delayF(data);
+                }
+            }
+            // - 返回值
+
+            return {
+                on: function (e, f) {
+                    if (e == "completion") {
+                        if (status == 1)
+                            f(data);
+                        else {
+                            delayF = f;
+                        }
+                    }
+                }
+            }
+        };
+
+        function foo(iFn) {
+
+            setTimeout(iFn(() => { return 1 }), 1000);
+        }
+
+
+        // - client
+
+        window.addEventListener("DOMContentLoaded", function () {
+            var btn1 = document.getElementById("btn1");
+            var btn2 = document.getElementById("btn2");
+            btn1.addEventListener("click", () => {
+                var evt = listener(foo);
+                evt.on("completion", function (data) { console.log(data) });
+                setTimeout(function () {
+                    evt.on("completion", (d) => console.log(d + 2));
+                }, 2000);
+            });
+
+            btn2.addEventListener("click", () => {
+                var p = foo(42);
+                p.then((data) => console.log(data));
+            });
+
+        });
+
+
+
+    </script>
+</head>
+
+<body>
+    <button id="btn1"> 模拟promise </button>
+    <br />
+    <button id="btn2"> promise </button>
+</body>
+
+</html>

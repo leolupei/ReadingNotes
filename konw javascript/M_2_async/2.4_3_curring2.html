@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <button>
+
+    </button>
+    <script>
+        var addEvent = function (el, type, fn, capture) {
+            if (window.addEventListener) {
+                el.addEventListener(type, function (e) {
+                    fn.call(el, e);
+                }, capture);
+            } else if (window.attachEvent) {
+                el.attachEvent("on" + type, function (e) {
+                    fn.call(el, e);
+                });
+            }
+        };
+
+        var addEvent2 = (function () {
+            if (window.addEventListener) {
+                return function (el, sType, fn, capture) {
+                    el.addEventListener(sType, function (e) {
+                        fn.call(el, e);
+                    }, (capture));
+                };
+            } else if (window.attachEvent) {
+                return function (el, sType, fn, capture) {
+                    el.attachEvent("on" + sType, function (e) {
+                        fn.call(el, e);
+                    });
+                };
+            }
+        })();
+
+        
+
+    </script>
+</body>
+
+</html>

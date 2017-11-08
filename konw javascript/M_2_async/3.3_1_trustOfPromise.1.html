@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .outer {
+            width: 100px;
+            height: 100px;
+            border: 1px solid red
+        }
+
+        .inner {
+            width: 80px;
+            height: 80px;
+            border: 1px solid green
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        window.addEventListener("DOMContentLoaded", function (evt) {
+            let btn1 = document.getElementById("btn1");
+            let btn2 = document.getElementById("btn2");
+
+            btn1.addEventListener("click", (evt) => {
+                earlyTest();
+            })
+
+            btn2.addEventListener("click", (evt) => {
+                MTTest();
+            })
+
+            MTTest2();
+
+            // - ---------------
+            document.getElementById("btn3").addEventListener("click", (evt) => { MTTest3(); })
+
+        })
+
+        // - ========== test 1 ==================
+        function promiseFun(resolve, reject) {
+
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", "http://localhost:3000/age");
+            xhr.responseType = "json";
+            xhr.send();
+            xhr.addEventListener("readystatechange", (evt) => {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    if (xhr.status == 200 || xhr.status == 304) {
+                        resolve(xhr.response);
+                    }
+                }
+            });
+
+        }
+
+        function earlyTest() {
+            let p = new Promise(promiseFun).then((data) => { console.log(data) });
+        }
+
+        // - ============ test 2 ==================
+        function MTTest() {
+
+            new Promise((resolve, reject) => {
+                setTimeout(() => resolve("setTimeout"), 0);
+            }).then((data) => console.log(data))
+
+            console.log("script start");
+
+            // Promise.resolve().then(
+            //     () => { console.log("promise1") }).then(
+            //     () => console.log("promise2")
+            //     );
+
+            console.log("script end");
+        }
+
+        // - ========== test 3 =================
+        function MTTest2() {
+            var outer = document.querySelector('.outer');
+            var inner = document.querySelector('.inner');
+
+            new MutationObserver(function () {
+                console.log('mutate');
+            }).observe(outer, { attributes: true })
+
+            function onclick() {
+                console.log("click");
+                setTimeout(() => { console.log("timeout") }, 0);
+                Promise.resolve().then(() => console.log('promise'));
+                outer.setAttribute('data-random', Math.random());
+            }
+
+            inner.addEventListener('click', onclick);
+            outer.addEventListener('click', onclick);
+
+            //inner.click();
+        }
+
+        function MTTest3() {
+            var p1 = new Promise((resolve, rejectt) => {
+                resolve("p1");
+            });
+
+            var p2 = new Promise((resolve, rejectt) => {
+                resolve(p1);
+            });
+
+            var p3 = new Promise((resolve, rejectt) => {
+                resolve("p3");
+            });
+
+
+            p2.then((v) => { console.log(v); return v });
+
+            p3.then((v) => { console.log(v); return v }).then((v) => console.log("second " + v));
+        }
+
+    </script>
+
+    <button id="btn1">调用过早</button>
+    <br />
+    <button id="btn2">理解microtask</button>
+    <br />
+    <button id="btn3">理解2</button>
+    <div class="outer">
+        <div class="inner"></div>
+    </div>
+</body>
+
+</html>

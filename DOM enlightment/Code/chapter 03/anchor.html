@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script>
+        document.addEventListener("DOMContentLoaded",function(evt){
+            //console.log(document.querySelector('a').constructor);
+
+            let a = document.querySelector('a');
+
+            console.log(getPropertyName(a));
+
+        function getPropertyName(obj){
+            let chain = [];
+
+            if(typeof obj != "object") return chain;
+            
+            do{
+                chain.push({
+                    objNm: obj.toString(),
+                    ppyyNms: Object.getOwnPropertyNames(obj).sort() 
+                });
+            } while(obj = Object.getPrototypeOf(obj))
+            return chain; 
+        }
+        });
+
+
+       
+    </script>
+</head>
+<body>
+ <a href="http://pms.beyondh.com">test</a>   
+</body>
+</html>

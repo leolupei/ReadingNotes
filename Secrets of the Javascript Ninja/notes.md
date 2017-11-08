@@ -9,3 +9,5 @@
 > 迭代器模拟了一个闭包。迭代器保留了对generator上下文的引用，只要需要它，环境就存在着。
 >
 >* Generator生成的Iterator，不但继承了Iterator的原型， 也继承了Generator的原型.
+
+#### Promise 并发 ####
